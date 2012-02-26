@@ -7,9 +7,9 @@ Gem::Specification.new do |s|
   s.version     = Sonicliving::VERSION
   s.authors     = ["MAJ"]
   s.email       = ["maj@notlistening.com"]
-  s.homepage    = ""
-  s.summary     = "Implements most of the Sonic Living API V2 in Ruby"
-  s.description = "The Sonic Living API V2"
+  s.homepage    = "http://www.github.com/maj/sonicliving"
+  s.summary     = "Implements most of the Sonicliving API V2 in Ruby"
+  s.description = "Allows you to get information from the Sonicliving API"
 
   s.rubyforge_project = "sonicliving"
 

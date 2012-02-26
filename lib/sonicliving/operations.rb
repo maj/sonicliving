@@ -1,48 +1,73 @@
 module Sonicliving
   class << self
     def event_get( options = {} )
-      raw_event = get_from_sonic_living( "event/get", options )
-      raise NotFound unless raw_event
-      Event.new( raw_event.first )  
+      get_and_map( Event, __method__, options )
+    end
+
+    def event_popular( sort = "" )
+      get_and_map( Event, __method__, sort )
+    end
+
+    def event_popular_by_ip( options )
+      get_and_map( Event, __method__, options )
+    end
+
+    def event_ursvp( event_id )
+      get_and_map( Event, __method__, event_id )
+    end
+
+    def performer_get( options )
+      get_and_map( Performer, __method__,  options )
     end
 
     def performer_recognize( name )
-      raw_performers = get_from_sonic_living( "performer/recognize", :search => name )
-      raise NotFound unless raw_performers
-      raw_performers.map{ |raw_performer| Performer.new( raw_performer ) }
+      get_and_map( Performer, __method__,  :search => name )
+    end
+
+    def performer_search( options )
+      get_and_map( Performer, __method__,  options )
     end
 
     def performer_upcoming( performer_id )
-      raw_events = get_from_sonic_living( "performer/upcoming", :performer_id => performer_id )
-      raise NotFound unless raw_events
-      raw_events.map{ |raw_event| Event.new( raw_event ) }
+      get_and_map( Event, __method__, :performer_id => performer_id )
     end
 
     def location_locate( options = {} )
-      raw_locations = get_from_sonic_living( "location/locate", options )
-      raise NotFound unless raw_locations
-      raw_locations.map{ |raw_location| Location.new( raw_location) }
+      get_and_map( Location, __method__, options )
     end
 
-    def venue_upcoming ( venue_id )
-      raw_events = get_from_sonic_living( "venue/upcoming", :venue_id => venue_id )
-      raise NotFound unless raw_events
-      raw_events.map{ |raw_event| Event.new( raw_event) }      
-    end
-
-    def venue_recognize( name )
-      raw_venues = get_from_sonic_living( "venue/recognize", :search => name )
-      raise NotFound unless raw_venues
-      raw_venues.map{ |raw_venue| Venue.new( raw_venue ) }
+    def location_recognize( name )
+      get_and_map( Location, __method__, :search => name )
     end
 
     def venue_get( venue_id )
-      raw_venue = get_from_sonic_living( "venue/get", :venue_id => venue_id )
-      raise NotFound unless raw_venue
-      Venue.new( raw_venue.first )  
+      get_and_map( Venue, __method__,  :venue_id => venue_id )  
     end
 
+    def venue_lookup( options )
+      get_and_map( Venue, __method__,  options )  
+    end
+
+    def venue_recognize( name )
+      get_and_map( Venue, __method__, :search => name )
+    end
+
+    def venue_upcoming ( venue_id )
+      get_and_map( Venue, __method__, :venue_id => venue_id )
+    end
+  
     protected
+
+    def get_and_map( object_class, method_name, query)
+      raw_results = get_from_sonic_living( method_name.to_s.sub( "_", "/" ), query )
+      raise NotFound unless raw_results
+
+      if raw_results.size == 1
+        object_class.new( raw_results.first )  
+      else
+        raw_results.map{ |raw_result| object_class.new( raw_result ) }
+      end
+    end
 
     def get_from_sonic_living( endpoint, query )
       raise ArgumentError.new( "No API key set, call SonicLiving.configure( API_KEY ) first") unless @@api_key
